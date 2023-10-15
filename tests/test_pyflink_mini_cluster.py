@@ -38,7 +38,7 @@ def minicluster(request):
     return table_env
 
 
-def test_job1(minicluster):
+def test_job_1(minicluster):
     table_env = minicluster
 
     # Define the source table
@@ -54,30 +54,27 @@ def test_job1(minicluster):
     table_env.create_temporary_view("source_table_1", table)
 
     # Define the sink table
-    table_env.execute_sql(
-        """
+    table_env.execute_sql("""
         CREATE TABLE sink_table_1 (
             id INT,
             name STRING
         ) WITH (
-            'connector' = 'blackhole'
+            'connector' = 'print'
         )
-        """
-    )
+    """)
 
     # Define a transformation
-    table_result = table_env.execute_sql(
-        """
+    table_result = table_env.execute_sql("""
         INSERT INTO sink_table_1
         SELECT id, UPPER(name) as name
         FROM source_table_1
-        """
-    )
+    """)
     table_result.print()
 
     log(INFO, "Sleeping ...")
     time.sleep(1000)
 
+    # TODO (mehmet): Why is this not working?
     # with table_result.collect() as results:
     #     for i, result in enumerate(results):
     #         print(f"i= {i}, result= {result}")
@@ -86,37 +83,38 @@ def test_job1(minicluster):
     # table_env.execute("job_1")
 
 
-# Define a test function for Job 2
-def test_job2(minicluster):
+# Define a test function
+def test_job_2(minicluster):
     table_env = minicluster
 
-    # Define the source table for Job 2
+    # Define the source table
+    table = table_env.from_elements(
+        [(1, 25), (2, 30), (3, 22)],
+        DataTypes.ROW(
+            [
+                DataTypes.FIELD("id", DataTypes.INT()),
+                DataTypes.FIELD("age", DataTypes.INT())
+            ]
+        ),
+    )
+    table_env.create_temporary_view("source_table_2", table)
+
+
+    # Define the sink table
     table_env.execute_sql("""
-        CREATE TABLE source_table2 (
+        CREATE TABLE sink_table_2 (
             id INT,
             age INT
         ) WITH (
-            'connector' = 'COLLECTION',
-            'data' = '[(1, 25), (2, 30), (3, 22)]'
+            'connector' = 'print'
         )
     """)
 
-    # Define the sink table for Job 2
-    table_env.execute_sql("""
-        CREATE TABLE sink_table2 (
-            id INT,
-            age INT
-        ) WITH (
-            'connector' = 'COLLECTION'
-        )
-    """)
-
-    # Define a transformation for Job 2
-    table_env.execute_sql("""
-        INSERT INTO sink_table2
+    # Define a transformation
+    table_result = table_env.execute_sql("""
+        INSERT INTO sink_table_2
         SELECT id, age * 2 as age
-        FROM source_table2
+        FROM source_table_2
     """)
 
-    # Execute Job 2
-    table_env.execute("Job2")
+    table_result.print()
