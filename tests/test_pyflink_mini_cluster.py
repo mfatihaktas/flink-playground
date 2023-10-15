@@ -1,6 +1,6 @@
 """
 Refs:
-- https://www.alibabacloud.com/help/en/flink/developer-reference/print-connector
+- ...
 """
 
 import pytest
