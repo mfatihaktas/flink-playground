@@ -15,8 +15,16 @@ def minicluster(request):
     table_env = TableEnvironment.create(env_settings)
 
     table_config = table_env.get_config()
+    table_config.get_configuration().set_boolean("execution.shutdown-on-attached-job-finished", False)
+    table_config.get_configuration().set_boolean("execution.shutdown-on-application-finish", False)
+    table_config.get_configuration().set_boolean("execution.shutdown-on-attached-exit", False)
+
+    # Set config variables in another way, just to make sure...
     config = Configuration()
     config.set_string("parallelism.default", "1")
+    config.set_boolean("execution.shutdown-on-attached-job-finished", False)
+    config.set_boolean("execution.shutdown-on-application-finish", False)
+    config.set_boolean("execution.shutdown-on-attached-exit", False)
     table_config.add_configuration(config)
 
     # # Add teardown code to stop the MiniCluster when the test session is finished
