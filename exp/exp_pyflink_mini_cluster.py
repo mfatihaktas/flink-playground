@@ -1,4 +1,3 @@
-import pytest
 import time
 
 from pyflink.common import Configuration
@@ -8,8 +7,7 @@ from pyflink.table.descriptors import Schema
 from src.utils.debug import *
 
 
-@pytest.fixture(scope="session")
-def minicluster(request):
+def get_table_env() -> TableEnvironment:
     env_settings = EnvironmentSettings.in_batch_mode()
     # env_settings = EnvironmentSettings.in_streaming_mode()
     table_env = TableEnvironment.create(env_settings)
@@ -19,17 +17,10 @@ def minicluster(request):
     config.set_string("parallelism.default", "1")
     table_config.add_configuration(config)
 
-    # # Add teardown code to stop the MiniCluster when the test session is finished
-    # def close_minicluster():
-    #     table_env.get_execution_environment().get_mini_cluster().close()
-    # request.addfinalizer(close_minicluster)
-
     return table_env
 
 
-def test_job_1(minicluster):
-    table_env = minicluster
-
+def run_job_1(table_env: TableEnvironment):
     # Define the source table
     table = table_env.from_elements(
         [(1, "Alice"), (2, "Bob"), (3, "Charlie")],
@@ -60,21 +51,8 @@ def test_job_1(minicluster):
     """)
     table_result.print()
 
-    log(INFO, "Sleeping ...")
-    time.sleep(1000)
 
-    # TODO (mehmet): Why is this not working?
-    # with table_result.collect() as results:
-    #     for i, result in enumerate(results):
-    #         print(f"i= {i}, result= {result}")
-
-    # Execute the job
-    # table_env.execute("job_1")
-
-
-def test_job_2(minicluster):
-    table_env = minicluster
-
+def run_job_2(table_env: TableEnvironment):
     # Define the source table
     table = table_env.from_elements(
         [(1, 25), (2, 30), (3, 22)],
@@ -106,3 +84,12 @@ def test_job_2(minicluster):
     """)
 
     table_result.print()
+
+
+if __name__ == '__main__':
+    table_env = get_table_env()
+    run_job_1(table_env)
+    run_job_2(table_env)
+
+    # log(INFO, "Sleeping ...")
+    # time.sleep(1000)
