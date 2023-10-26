@@ -11,7 +11,19 @@ python = ">=3.7.1,<3.11"
 pytest = "^7.4.2"
 apache-flink = "^1.17.1"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.1"
+log_cli = "true"
+# log_cli_level = "DEBUG"
+log_cli_level = "INFO"
+## Note: This will allow pytest to print out all the logging output to cli.
+# log_cli_level = "NOTSET"
+log_cli_format = "%(levelname)s] %(file_name)s:%(line_number)s - %(func_name)s: %(message)s"
+# addopts = "--show-capture=stderr"
+testpaths = [
+    "tests",
+]
