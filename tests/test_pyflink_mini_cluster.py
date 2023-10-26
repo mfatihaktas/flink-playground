@@ -68,8 +68,8 @@ def test_job_1(minicluster):
     """)
     table_result.print()
 
-    log(INFO, "Sleeping ...")
-    time.sleep(1000)
+    # log(INFO, "Sleeping ...")
+    # time.sleep(1000)
 
     # TODO (mehmet): Why is this not working?
     # with table_result.collect() as results:
