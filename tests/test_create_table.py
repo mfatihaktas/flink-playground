@@ -53,3 +53,37 @@ def test_create_table_as(table_env):
 
     # for result in table_result.collect():
     #     print(result)
+
+
+def test_create_table_without_connector(table_env):
+    # Define the source table
+    # table_env.execute_sql("""
+    #     CREATE TABLE source_table (
+    #         a INT,
+    #         b INT
+    #     );
+    # """)
+    table_env.execute_sql("""
+        CREATE TEMPORARY TABLE IF NOT EXISTS source_table (
+            a INT,
+            b INT
+        );
+    """)
+
+    table_env.execute_sql(
+        "INSERT INTO source_table VALUES (35, 1), (32, 2)"
+    )
+
+    # Define the sink table
+    table_env.execute_sql("""
+        CREATE TABLE sink_table (
+            a INT,
+            b INT
+        ) WITH (
+            'connector' = 'print'
+        )
+    """)
+    table_result = table_env.execute_sql("""
+        INSERT INTO sink_table
+        SELECT * FROM source_table
+    """)
